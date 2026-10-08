@@ -1,0 +1,7 @@
+# Only allow .php scripts to be invoked — block direct file listing
+Options -Indexes
+
+# Prevent direct access to the helpers file
+<Files "_helpers.php">
+    Require all denied
+</Files>

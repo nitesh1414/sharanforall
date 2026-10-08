@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You're Offline — Sharan Foundation</title>
+<meta name="theme-color" content="#2563eb">
+<link rel="icon" href="/icons/favicon-32.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<style>
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Segoe UI',Tahoma,sans-serif;
+    background:linear-gradient(135deg,#0d2940 0%,#2563eb 60%,#f4a261 130%);
+    min-height:100vh;display:grid;place-items:center;padding:1.5rem;color:#fff;text-align:center;
+  }
+  .wrap{max-width:520px;animation:fadeUp .7s ease}
+  .logo{width:90px;height:90px;border-radius:50%;margin:0 auto 1.5rem;background:#fff;display:grid;place-items:center;box-shadow:0 14px 40px rgba(0,0,0,.3);overflow:hidden;border:3px solid #f4a261}
+  .logo img{width:100%;height:100%;object-fit:cover}
+  h1{font-size:clamp(1.6rem,4vw,2.2rem);margin-bottom:.6rem;font-weight:800}
+  .accent{color:#f4a261}
+  p{color:#bfd0e3;font-size:1rem;line-height:1.6;margin-bottom:.6rem}
+  .icon-big{font-size:4rem;margin-bottom:1rem;display:inline-block;animation:wifi 2s ease-in-out infinite}
+  .status{display:inline-flex;align-items:center;gap:.5rem;background:rgba(255,255,255,.15);padding:.5rem 1.1rem;border-radius:50px;margin-top:1.2rem;font-size:.9rem;backdrop-filter:blur(8px)}
+  .dot{width:10px;height:10px;border-radius:50%;background:#ef4444;animation:pulse 1.5s ease-in-out infinite}
+  .dot.online{background:#10b981;animation:none}
+  .actions{margin-top:2rem;display:flex;gap:.7rem;justify-content:center;flex-wrap:wrap}
+  .btn{display:inline-block;padding:.85rem 1.6rem;background:#f4a261;color:#fff;border:none;border-radius:50px;font-weight:600;cursor:pointer;text-decoration:none;font-size:.95rem;transition:.25s}
+  .btn:hover{background:#e76f51;transform:translateY(-2px);box-shadow:0 10px 25px rgba(231,111,81,.4)}
+  .btn-outline{background:transparent;border:2px solid rgba(255,255,255,.4);color:#fff}
+  .btn-outline:hover{background:rgba(255,255,255,.1)}
+  .cached-tip{background:rgba(255,255,255,.08);padding:1rem 1.4rem;border-radius:12px;margin-top:2rem;border-left:3px solid #f4a261;text-align:left;font-size:.88rem;line-height:1.6}
+  .cached-tip strong{color:#f4a261;display:block;margin-bottom:.3rem}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes wifi{0%,100%{opacity:1}50%{opacity:.4}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 10px rgba(239,68,68,0)}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="logo"><img src="/icons/icon-192.png" alt="Sharan Foundation" onerror="this.parentElement.innerHTML='🕊️';this.parentElement.style.fontSize='3rem';"></div>
+    <div class="icon-big">📡</div>
+    <h1>You're <span class="accent">Offline</span></h1>
+    <p>Looks like you've lost your internet connection.</p>
+    <p>Pages you've visited before are still available — try opening one from the menu, or check your connection and reload.</p>
+
+    <div class="status"><span class="dot" id="statusDot"></span><span id="statusText">Offline</span></div>
+
+    <div class="actions">
+      <button class="btn" onclick="location.reload()">🔄 Try Again</button>
+      <a href="/" class="btn btn-outline">🏠 Home</a>
+    </div>
+
+    <div class="cached-tip">
+      <strong>💡 Did you know?</strong>
+      Sharan Foundation works as a Progressive Web App. You can install it on your home screen and access content even without internet. Any donations or form submissions made offline will be saved and sent automatically when you reconnect.
+    </div>
+  </div>
+
+  <script>
+    // Auto-reload when connection comes back
+    const dot  = document.getElementById('statusDot');
+    const text = document.getElementById('statusText');
+    function updateStatus() {
+      if (navigator.onLine) {
+        dot.classList.add('online');
+        text.textContent = 'Back online — reloading...';
+        setTimeout(() => location.reload(), 700);
+      } else {
+        dot.classList.remove('online');
+        text.textContent = 'Offline';
+      }
+    }
+    window.addEventListener('online',  updateStatus);
+    window.addEventListener('offline', updateStatus);
+    updateStatus();
+  </script>
+</body>
+</html>

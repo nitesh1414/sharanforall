@@ -1,0 +1,95 @@
+{
+  "name": "Sharan Foundation",
+  "short_name": "Sharan",
+  "description": "Sharan Foundation — A Christian charity transforming lives through education, shelter and faith across India and Nepal.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui", "browser"],
+  "orientation": "any",
+  "background_color": "#0d2940",
+  "theme_color": "#2563eb",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["education", "charity", "nonprofit", "social"],
+  "prefer_related_applications": false,
+
+  "icons": [
+    { "src": "icons/icon-72.png",            "sizes": "72x72",   "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-96.png",            "sizes": "96x96",   "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-128.png",           "sizes": "128x128", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-144.png",           "sizes": "144x144", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-152.png",           "sizes": "152x152", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-180.png",           "sizes": "180x180", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-192.png",           "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-384.png",           "sizes": "384x384", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png",           "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+    { "src": "icons/icon-maskable-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+
+  "screenshots": [
+    {
+      "src": "images/hero.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Sharan Foundation Homepage"
+    },
+    {
+      "src": "images/about.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "Our Community Care Campus"
+    }
+  ],
+
+  "shortcuts": [
+    {
+      "name": "Donate Now",
+      "short_name": "Donate",
+      "description": "Make a donation to support our work",
+      "url": "/pages/donate.php",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Our Programs",
+      "short_name": "Programs",
+      "description": "View our core charity programs",
+      "url": "/pages/programs.php",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Volunteer",
+      "short_name": "Volunteer",
+      "description": "Apply to volunteer with us",
+      "url": "/pages/volunteer.php",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Contact",
+      "short_name": "Contact",
+      "description": "Get in touch with us",
+      "url": "/pages/contact.php",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+
+  "share_target": {
+    "action": "/pages/contact.php",
+    "method": "GET",
+    "params": {
+      "title": "subject",
+      "text":  "message",
+      "url":   "shared_url"
+    }
+  },
+
+  "related_applications": [],
+
+  "edge_side_panel": {
+    "preferred_width": 480
+  }
+}

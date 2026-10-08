@@ -1,0 +1,34 @@
+{
+    "name": "Sharan Foundation",
+    "short_name": "Sharan",
+    "description": "A Community Care &amp; Transformation Campus",
+    "start_url": "/index.php",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "background_color": "#0f0f1a",
+    "theme_color": "#1a1a2e",
+    "icons": [
+        {
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshot.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        }
+    ],
+    "categories": [
+        "productivity",
+        "utilities"
+    ],
+    "lang": "en-US",
+    "dir": "ltr",
+    "prefer_related_applications": false
+}

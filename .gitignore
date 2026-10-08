@@ -1,0 +1,28 @@
+# Composer
+/vendor/
+composer.lock
+
+# Logs & uploads (don't commit user-generated data)
+/logs/*.log
+/uploads/**/*
+!/uploads/**/.htaccess
+!/uploads/**/.gitkeep
+
+# Local config overrides
+/config/database.local.php
+.env
+.env.local
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Install / security
+/install.php.bak
+
+# Caches
+.cache/

@@ -1,0 +1,18 @@
+# Block PHP / script execution inside uploads directory
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|pht|cgi|pl|py|jsp|asp|sh|exe)$">
+  Require all denied
+</FilesMatch>
+
+# Allow images
+<FilesMatch "\.(jpe?g|png|gif|webp|svg|ico)$">
+  Require all granted
+</FilesMatch>
+
+# Allow videos
+<FilesMatch "\.(mp4|webm|ogg|ogv|mov)$">
+  Require all granted
+</FilesMatch>
+
+# Increase max upload (only effective if your host respects per-folder .htaccess overrides)
+# php_value upload_max_filesize 50M
+# php_value post_max_size 55M

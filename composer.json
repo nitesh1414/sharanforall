@@ -1,0 +1,46 @@
+{
+    "name": "sharanfoundation/acts-foundation-website",
+    "description": "Sharan Foundation — Christian charity website with donations, fundraisers, recurring billing, hero carousel and multi-language support (India & Nepal).",
+    "type": "project",
+    "license": "MIT",
+    "keywords": ["charity", "nonprofit", "donations", "fundraising", "php", "mysql"],
+    "homepage": "https://sharanforall.org",
+    "authors": [
+        {
+            "name": "Sharan Foundation",
+            "email": "tech@sharanforall.org"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpmailer/phpmailer": "^6.9",
+        "setasign/fpdf": "^1.8"
+    },
+    "suggest": {
+        "phpmailer/phpmailer": "Recommended for production SMTP email delivery (overrides the bundled copy)",
+        "setasign/fpdf": "Recommended for PDF receipts (overrides the bundled copy)",
+        "razorpay/razorpay": "For deeper Razorpay integration (we use direct REST by default)",
+        "stripe/stripe-php": "For deeper Stripe integration (we use direct REST by default)"
+    },
+    "autoload": {
+        "files": [
+            "includes/version.php",
+            "includes/functions.php"
+        ],
+        "classmap": [
+            "includes/"
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "platform-check": false
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "@php -r \"echo '✓ Composer dependencies installed. Run install.php to set up the database.';\""
+        ]
+    }
+}
