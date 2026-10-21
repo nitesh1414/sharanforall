@@ -33,6 +33,10 @@ require __DIR__ . '/../includes/public_header.php';
 ?>
 
 <div class="success-wrap">
+  <?php if ($flash): ?>
+    <div class="alert <?= e($flash['type']) ?>"><?= e($flash['msg']) ?></div>
+  <?php endif; ?>
+
   <div class="success-card">
     <div class="success-icon">✓</div>
     <h1>Thank You! 🙏</h1>

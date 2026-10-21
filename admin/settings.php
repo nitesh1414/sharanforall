@@ -27,16 +27,37 @@ if ($_SERVER['REQUEST_METHOD']==='POST' && csrf_check($_POST['csrf'] ?? '')) {
         'guiding_scripture','scripture_reference','motto','motto_hi','locations_served',
         'smtp_host','smtp_port','smtp_username','smtp_password',
         'smtp_encryption','smtp_from_email','smtp_from_name','admin_notify_email',
-        'default_language'
+        'default_language',
+        'bank_in_name','bank_in_account_name','bank_in_account_no','bank_in_ifsc','bank_in_branch','bank_in_upi',
+        'bank_uk_name','bank_uk_account_name','bank_uk_account_no','bank_uk_sort_code','bank_uk_branch','bank_uk_charity_no',
+        'bank_note'
     ];
     $data = [];
     foreach ($fields as $f) $data[$f] = trim($_POST[$f] ?? '');
+    // Payment gateway visibility toggle (checkbox — unchecked means hidden)
+    $data['donate_show_gateways'] = isset($_POST['donate_show_gateways']) ? 1 : 0;
     // Don't overwrite saved SMTP password if blank
     if ($data['smtp_password'] === '') {
         unset($data['smtp_password']);
     }
-    $set = implode(',', array_map(fn($k)=>"$k=:$k", array_keys($data)));
-    $pdo->prepare("UPDATE settings SET $set WHERE id=1")->execute($data);
+    // UPI QR code image (optional upload — shown on Donate & Fundraising pages)
+    $qr = upload_image('bank_qr', 'bank', 800, 800);
+    if ($qr === false) {
+        flash_set('error', 'QR code upload failed. Use JPG/PNG/WebP/GIF under 5 MB.');
+        redirect(ADMIN_URL.'settings.php#bank');
+    }
+    if ($qr) {
+        $data['bank_qr_image'] = $qr;
+    } elseif (!empty($_POST['bank_qr_remove'])) {
+        $data['bank_qr_image'] = '';
+    }
+    try {
+        $set = implode(',', array_map(fn($k)=>"$k=:$k", array_keys($data)));
+        $pdo->prepare("UPDATE settings SET $set WHERE id=1")->execute($data);
+    } catch (Throwable $e) {
+        flash_set('error', 'Could not save settings — the database may be missing new columns. Re-run sql/acts_foundation.sql (safe to re-import), then try again.');
+        redirect(ADMIN_URL.'settings.php#bank');
+    }
     $saved = $pdo->query("SELECT * FROM settings LIMIT 1")->fetch(PDO::FETCH_ASSOC) ?: $data;
     flash_saved('updated', 'Site settings', $saved);
     redirect(ADMIN_URL.'settings.php');
@@ -46,7 +67,7 @@ $s = $pdo->query("SELECT * FROM settings LIMIT 1")->fetch();
 ?>
 <div class="page-head"><div><h2>Site Settings</h2><p class="sub">General information shown across your website.</p></div></div>
 
-<form method="post" class="card"><?= csrf_field() ?>
+<form method="post" enctype="multipart/form-data" class="card"><?= csrf_field() ?>
   <div class="card-head"><h3>🏷️ Identity</h3></div>
   <div class="card-body">
     <div class="form-row">
@@ -114,6 +135,68 @@ $s = $pdo->query("SELECT * FROM settings LIMIT 1")->fetch();
       <div class="form-group"><label>Twitter / X URL</label><input type="url" name="twitter" value="<?= e($s['twitter']) ?>"></div>
       <div class="form-group"><label>YouTube URL</label><input type="url" name="youtube" value="<?= e($s['youtube']) ?>"></div>
     </div>
+  </div>
+
+  <!-- BANK DETAILS & QR CODE -->
+  <div class="card-head" id="bank"><h3>🏦 Bank Details &amp; QR Code</h3></div>
+  <div class="card-body">
+    <p class="help" style="margin-bottom:1.2rem">Shown on the <strong>Donate</strong> page and <strong>Fundraising</strong> pages so donors can pay via direct bank transfer or UPI. Leave a field blank to hide it from the website.</p>
+
+    <h4 style="color:var(--primary-dark);margin-bottom:.8rem">🇮🇳 India — Bank Transfer / UPI</h4>
+    <div class="form-row">
+      <div class="form-group"><label>Account Name</label><input type="text" name="bank_in_account_name" value="<?= e($s['bank_in_account_name'] ?? '') ?>" placeholder="Sharan Foundation"></div>
+      <div class="form-group"><label>Account Number</label><input type="text" name="bank_in_account_no" value="<?= e($s['bank_in_account_no'] ?? '') ?>" placeholder="1234567890123"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>IFSC Code</label><input type="text" name="bank_in_ifsc" value="<?= e($s['bank_in_ifsc'] ?? '') ?>" placeholder="SBIN0001234"></div>
+      <div class="form-group"><label>Bank Name</label><input type="text" name="bank_in_name" value="<?= e($s['bank_in_name'] ?? '') ?>" placeholder="State Bank of India"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Branch</label><input type="text" name="bank_in_branch" value="<?= e($s['bank_in_branch'] ?? '') ?>" placeholder="Hyderabad"></div>
+      <div class="form-group"><label>UPI ID</label><input type="text" name="bank_in_upi" value="<?= e($s['bank_in_upi'] ?? '') ?>" placeholder="sharanfoundation@upi"></div>
+    </div>
+
+    <h4 style="color:var(--primary-dark);margin:1.5rem 0 .8rem">🇬🇧 UK — Bank Transfer</h4>
+    <div class="form-row">
+      <div class="form-group"><label>Account Name</label><input type="text" name="bank_uk_account_name" value="<?= e($s['bank_uk_account_name'] ?? '') ?>" placeholder="Sharan Foundation UK"></div>
+      <div class="form-group"><label>Account Number</label><input type="text" name="bank_uk_account_no" value="<?= e($s['bank_uk_account_no'] ?? '') ?>" placeholder="12345678"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Sort Code</label><input type="text" name="bank_uk_sort_code" value="<?= e($s['bank_uk_sort_code'] ?? '') ?>" placeholder="12-34-56"></div>
+      <div class="form-group"><label>Bank Name</label><input type="text" name="bank_uk_name" value="<?= e($s['bank_uk_name'] ?? '') ?>" placeholder="Barclays"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Branch</label><input type="text" name="bank_uk_branch" value="<?= e($s['bank_uk_branch'] ?? '') ?>" placeholder="London"></div>
+      <div class="form-group"><label>Charity No.</label><input type="text" name="bank_uk_charity_no" value="<?= e($s['bank_uk_charity_no'] ?? '') ?>" placeholder="1234567"></div>
+    </div>
+
+    <div class="form-group">
+      <label>UPI QR Code Image</label>
+      <input type="file" name="bank_qr" accept="image/*">
+      <p class="help">Upload the QR code donors can scan to pay via UPI (JPG/PNG/WebP/GIF, max 5 MB). Shown next to the bank details on the Donate &amp; Fundraising pages.</p>
+      <?php if (!empty($s['bank_qr_image'])): ?>
+        <div class="current-image" style="max-width:180px;margin-top:.6rem"><img src="<?= BASE_URL . e($s['bank_qr_image']) ?>" alt="UPI QR code"></div>
+        <label style="display:block;margin-top:.6rem"><input type="checkbox" name="bank_qr_remove" value="1"> Remove current QR code image</label>
+      <?php endif; ?>
+    </div>
+
+    <div class="form-group">
+      <label>Extra Note (optional)</label>
+      <input type="text" name="bank_note" value="<?= e($s['bank_note'] ?? '') ?>" placeholder="please fill out the form above with your transaction ID so we can send your receipt.">
+      <p class="help">Shown after "After making payment," in the bank details box on the Donate page.</p>
+    </div>
+  </div>
+
+  <div class="card-head" id="gateways"><h3>💳 Payment Gateway</h3></div>
+  <div class="card-body">
+    <label class="checkbox-row" style="display:flex;align-items:flex-start;gap:.6rem;cursor:pointer">
+      <input type="checkbox" name="donate_show_gateways" value="1" <?= ($s['donate_show_gateways'] ?? 1) ? 'checked' : '' ?> style="width:18px;height:18px;margin-top:2px;accent-color:var(--primary)">
+      <span>
+        <strong>Show payment gateway options</strong> on the donation page (Razorpay / Stripe / PayPal).<br>
+        <small style="color:#888">When hidden, only the bank details &amp; QR code are shown — placed after the donor information — and donors pay via bank transfer / UPI. The "tax receipt" and "newsletter" checkboxes also appear only when a payment gateway is used.</small>
+      </span>
+    </label>
+    <p class="help">Enable/disable individual gateways and manage their credentials on the <a href="<?= ADMIN_URL ?>payments.php">Payment Gateways</a> page.</p>
   </div>
 
   <div class="card-head" id="language"><h3>🌐 Language</h3></div>

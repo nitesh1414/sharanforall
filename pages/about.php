@@ -65,6 +65,12 @@ require __DIR__ . '/../includes/public_header.php';
   </div>
 </section>
 
+<?php if ($flash): ?>
+  <div class="container" style="margin-top:1.5rem">
+    <div class="alert <?= e($flash['type']) ?>"><?= e($flash['msg']) ?></div>
+  </div>
+<?php endif; ?>
+
 <section class="sec-cream">
   <div class="container">
     <div class="story-grid story">
@@ -103,7 +109,7 @@ require __DIR__ . '/../includes/public_header.php';
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;margin-bottom:3rem">
       <?php foreach ($vision_cap as $vc): ?>
         <div style="background:#fff;border-radius:14px;padding:1.8rem;text-align:center;box-shadow:var(--shadow);border-top:4px solid var(--primary);transition:.25s" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform=''">
-          <div style="font-size:2.2rem;margin-bottom:.6rem"><?= e($vc['icon']) ?></div>
+          <div style="font-size:2.2rem;margin-bottom:.6rem"><?= e(icon_or($vc['icon'], '👥')) ?></div>
           <div style="font-size:16px;color:var(--primary);font-weight:800"><?= number_format($vc['capacity']) ?></div>
           <p style="color:var(--gray);text-transform:uppercase;letter-spacing:1px;margin-top:.3rem"><?= e(current_lang()==='hi' && $vc['category_hi'] ? $vc['category_hi'] : $vc['category']) ?></p>
         </div>
@@ -135,7 +141,7 @@ require __DIR__ . '/../includes/public_header.php';
         $sc = ['upcoming'=>'#d4a017','active'=>'#2563eb','completed'=>'#0b6e4f'][$ph['status']] ?? '#888'; ?>
         <div style="background:#fff;border-radius:14px;padding:1.8rem;box-shadow:var(--shadow);border-top:4px solid <?= $sc ?>;transition:.25s;position:relative" onmouseover="this.style.transform='translateY(-5px)'" onmouseout="this.style.transform=''">
           <div style="position:absolute;top:1rem;right:1rem;background:<?= $sc ?>;color:#fff;padding:.2rem .7rem;border-radius:50px;font-size:.7rem;font-weight:700;text-transform:uppercase"><?= e($ph['status']) ?></div>
-          <div style="font-size:2.4rem;margin-bottom:.6rem"><?= e($ph['icon']) ?></div>
+          <div style="font-size:2.4rem;margin-bottom:.6rem"><?= e(icon_or($ph['icon'], '🎯')) ?></div>
           <div style="color:var(--primary);font-weight:800;font-size:.85rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:.3rem">Phase <?= (int)$ph['phase_number'] ?></div>
           <h3 style="color:var(--dark);margin-bottom:.6rem"><?= e(current_lang()==='hi' && $ph['title_hi'] ? $ph['title_hi'] : $ph['title']) ?></h3>
           <?php if ($ph['capacity']): ?>
@@ -176,7 +182,7 @@ require __DIR__ . '/../includes/public_header.php';
         <div class="tl-item">
           <div class="tl-card" style="<?= $ms['is_highlight'] ? 'border-top-width:5px;background:linear-gradient(135deg,#fff,#f0f7ff)' : '' ?>">
             <span class="tl-year"><?= e($ms['year']) ?></span>
-            <h4><?= e($ms['icon']) ?> <?= e(current_lang()==='hi' && $ms['title_hi'] ? $ms['title_hi'] : $ms['title']) ?></h4>
+            <h4><?= e(icon_or($ms['icon'], '✦')) ?> <?= e(current_lang()==='hi' && $ms['title_hi'] ? $ms['title_hi'] : $ms['title']) ?></h4>
             <p><?= e(current_lang()==='hi' && $ms['description_hi'] ? $ms['description_hi'] : $ms['description']) ?></p>
           </div>
         </div>

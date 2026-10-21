@@ -11,6 +11,15 @@ $programs = $pdo->query("SELECT title, title_hi, slug FROM programs WHERE status
 $gateways = available_gateways();
 $gateway_mode = gateway_mode();
 
+// Admin can show/hide the payment gateway information (Site Settings → Payment Gateway).
+// When hidden, only the bank details + QR are shown — placed after the donor information.
+$show_gateways = ((int)get_setting('donate_show_gateways', '1') === 1) && !empty($gateways);
+
+// Admin-managed bank details + QR card (rendered before the form when gateways
+// are shown, or after the donor information when they are hidden)
+$bd = bank_details();
+$bank_card = bank_card_html($bd);
+
 // Donation stats (anonymized totals to build social proof)
 $total_donors_completed = (int)$pdo->query("SELECT COUNT(DISTINCT email) FROM donations WHERE payment_status='completed'")->fetchColumn();
 $total_raised_inr = (float)$pdo->query("SELECT COALESCE(SUM(amount),0) FROM donations WHERE payment_status='completed' AND currency='INR'")->fetchColumn();
@@ -103,6 +112,12 @@ $extra_head = '<style>
   .bank-grid li{padding:.45rem 0;border-bottom:1px dashed #ddd;font-size:14px;display:grid;grid-template-columns:1fr 1fr;gap:.75rem;align-items:center}
   .bank-grid li span{text-align:left}
   .bank-grid li strong{color:var(--primary-dark);text-align:right}
+  /* Bank details (left) and QR code (right) side by side */
+  .bank-layout{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:2rem;align-items:center}
+  .bank-layout.no-qr{grid-template-columns:1fr}
+  .bank-qr{text-align:center;background:#fff;border:1px solid #eee;border-radius:12px;padding:1.2rem;box-shadow:var(--shadow)}
+  .bank-qr img{max-width:100%;border-radius:8px}
+  .bank-qr p{font-size:.78rem;color:var(--gray);margin-top:.5rem}
 
   .submit-btn{width:100%;padding:.75rem;font-size:14px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border:none;border-radius:10px;cursor:pointer;transition:.25s;letter-spacing:.4px;text-transform:uppercase;box-shadow:0 8px 20px rgba(231,111,81,.3);font-family:var(--font-heading)}
   .submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(231,111,81,.45)}
@@ -114,7 +129,7 @@ $extra_head = '<style>
   }
   @media(max-width:780px){
     .donate-form-card{padding:1.5rem}
-    .form-row,.form-row-3,.bank-grid{grid-template-columns:1fr}
+    .form-row,.form-row-3,.bank-grid,.bank-layout{grid-template-columns:1fr}
     .impact-tiers,.pay-methods{grid-template-columns:repeat(2,minmax(0,1fr))}
     .stats-bar-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
     .section-toolbar{align-items:flex-start}
@@ -147,6 +162,15 @@ require __DIR__ . '/../includes/public_header.php';
     </div>
   </div>
 </section>
+
+<!-- BANK DETAILS + QR (managed from Admin → Site Settings) — shown FIRST, before the payment gateway form -->
+<?php if ($bank_card && $show_gateways): ?>
+<section class="sec-sand" style="padding:2.5rem 0">
+  <div class="container" style="max-width:1000px">
+    <?= $bank_card ?>
+  </div>
+</section>
+<?php endif; ?>
 
 <!-- DONATION FORM -->
 <section class="sec-cream" id="donation-form">
@@ -279,33 +303,40 @@ require __DIR__ . '/../includes/public_header.php';
         </div>
       </div>
 
+      <?php if ($bank_card && !$show_gateways): ?>
+      <!-- BANK DETAILS + QR — shown after the donor information when payment gateways are hidden -->
+      <div class="form-section">
+        <?= $bank_card ?>
+      </div>
+      <?php endif; ?>
+
       <!-- PAYMENT METHOD -->
       <div class="form-section">
         <h3><?= e(t('payment_info')) ?></h3>
 
-        <?php if ($gateway_mode === 'sandbox' && $gateways): ?>
+        <?php if ($gateway_mode === 'sandbox' && $show_gateways): ?>
           <div style="background:#fef7e0;padding:.6rem 1rem;border-left:3px solid #d4a017;border-radius:6px;color:#5b4a2c;font-size:14px;margin-bottom:1rem">
             🧪 <strong>Sandbox/Test Mode</strong> — no real money will be charged. Use gateway test cards.
           </div>
         <?php endif; ?>
 
         <div class="pay-methods">
-          <!-- Live gateway options first -->
-          <?php foreach ($gateways as $gw_id => $gw):
+          <!-- Live gateway options (hidden when the admin disables payment gateway information) -->
+          <?php if ($show_gateways): foreach ($gateways as $gw_id => $gw):
             $checked = $gw_id === 'razorpay' ? 'checked' : ''; ?>
           <div class="pay-method"><input type="radio" name="payment_method" value="<?= $gw_id ?>" id="pm-<?= $gw_id ?>" <?= $checked ?> data-live="1"><label for="pm-<?= $gw_id ?>"><span class="ico"><?= $gw['icon'] ?></span><?= e($gw['name']) ?><br><small style="font-weight:400;color:#888;font-size:14px"><?= e($gw['desc']) ?></small></label></div>
-          <?php endforeach; ?>
+          <?php endforeach; endif; ?>
 
           <!-- Manual methods (always available) -->
-          <div class="pay-method"><input type="radio" name="payment_method" value="upi" id="pm-upi" <?= !$gateways ? 'checked' : '' ?>><label for="pm-upi"><span class="ico">📱</span>UPI<br><small style="font-weight:400;color:#888;font-size:14px">Pay later manually</small></label></div>
+          <div class="pay-method"><input type="radio" name="payment_method" value="upi" id="pm-upi" <?= !$show_gateways ? 'checked' : '' ?>><label for="pm-upi"><span class="ico">📱</span>UPI<br><small style="font-weight:400;color:#888;font-size:14px">Pay later manually</small></label></div>
           <div class="pay-method"><input type="radio" name="payment_method" value="bank_transfer" id="pm-bank"><label for="pm-bank"><span class="ico">🏦</span>Bank Transfer<br><small style="font-weight:400;color:#888;font-size:14px">Pay later manually</small></label></div>
           <div class="pay-method"><input type="radio" name="payment_method" value="cheque" id="pm-ch"><label for="pm-ch"><span class="ico">📝</span>Cheque / DD<br><small style="font-weight:400;color:#888;font-size:14px">Send via post</small></label></div>
         </div>
 
         <div class="form-group" id="manualTxnField" style="margin-top:1rem">
-          <label>Transaction / Reference ID <span style="color:var(--gray);font-weight:400">(if already paid)</span></label>
-          <input type="text" name="transaction_id" placeholder="Leave blank if paying after submitting form">
-          <p class="help">For UPI / Bank Transfer: if you've already paid, enter the transaction ID here.</p>
+          <label>Transaction / Reference ID <span class="req">*</span></label>
+          <input type="text" name="transaction_id" required placeholder="UTR / bank reference number from your payment">
+          <p class="help">Required for UPI / Bank Transfer / Cheque — we verify this ID with the bank to confirm your donation.</p>
         </div>
 
         <div class="form-group">
@@ -314,51 +345,19 @@ require __DIR__ . '/../includes/public_header.php';
         </div>
 
         <label class="checkbox-row"><input type="checkbox" name="is_anonymous" value="1"><span><?= e(t('is_anonymous')) ?></span></label>
-        <label class="checkbox-row"><input type="checkbox" name="receipt_required" value="1" checked><span><?= e(t('receipt_required')) ?> (80G / Gift Aid)</span></label>
-        <label class="checkbox-row"><input type="checkbox" name="newsletter_optin" value="1" checked><span><?= e(t('newsletter_optin')) ?></span></label>
+        <?php if ($show_gateways): ?>
+        <!-- Shown only when a payment gateway is used (toggled by JS) -->
+        <div id="gatewayExtras">
+          <label class="checkbox-row"><input type="checkbox" name="receipt_required" value="1" checked><span><?= e(t('receipt_required')) ?> (80G / Gift Aid)</span></label>
+          <label class="checkbox-row"><input type="checkbox" name="newsletter_optin" value="1" checked><span><?= e(t('newsletter_optin')) ?></span></label>
+        </div>
+        <?php endif; ?>
       </div>
 
       <button type="submit" class="submit-btn" id="submitBtn">❤️ <?= e(t('complete_donation')) ?> →</button>
       <p style="text-align:center;margin-top:1rem;color:var(--gray);font-size:14px">🔒 Your information is safe. We use industry-standard encryption.</p>
     </form>
 
-  </div>
-</section>
-
-<!-- BANK DETAILS -->
-<section class="sec-sand">
-  <div class="container" style="max-width:1000px">
-    <div class="bank-details">
-      <h3><?= e(t('bank_details')) ?> &amp; UPI</h3>
-      <p style="color:var(--gray);font-size:14px;margin-bottom:1.2rem">If you prefer to make a direct bank transfer or use UPI, please use the details below:</p>
-      <div class="bank-grid">
-        <div>
-          <h4>🇮🇳 For Indian Donations</h4>
-          <ul>
-            <li><span><?= e(t('bank_account_name')) ?></span><strong>Sharan Foundation</strong></li>
-            <li><span><?= e(t('bank_account_number')) ?></span><strong>1234567890123</strong></li>
-            <li><span><?= e(t('bank_ifsc')) ?></span><strong>SBIN0001234</strong></li>
-            <li><span><?= e(t('bank_name')) ?></span><strong>State Bank of India</strong></li>
-            <li><span><?= e(t('bank_branch')) ?></span><strong>Hyderabad</strong></li>
-            <li><span><?= e(t('upi_id')) ?></span><strong style="color:var(--accent-dark)">sharanfoundation@upi</strong></li>
-          </ul>
-        </div>
-        <div>
-          <h4>🇬🇧 For UK Donations</h4>
-          <ul>
-            <li><span><?= e(t('bank_account_name')) ?></span><strong>Sharan Foundation UK</strong></li>
-            <li><span><?= e(t('bank_account_number')) ?></span><strong>12345678</strong></li>
-            <li><span>Sort Code</span><strong>12-34-56</strong></li>
-            <li><span><?= e(t('bank_name')) ?></span><strong>Barclays</strong></li>
-            <li><span><?= e(t('bank_branch')) ?></span><strong>London</strong></li>
-            <li><span>Charity No.</span><strong>1234567</strong></li>
-          </ul>
-        </div>
-      </div>
-      <p style="margin-top:1.5rem;font-size:14px;color:#5b4a2c;background:#fffaf0;padding:.7rem 1rem;border-radius:6px">
-        💡 <strong>After making payment</strong>, please fill out the form above with your transaction ID so we can send your receipt.
-      </p>
-    </div>
   </div>
 </section>
 
@@ -434,12 +433,23 @@ function syncRecurring() {
 donType.addEventListener('change', syncRecurring);
 syncRecurring();
 
-// Toggle manual transaction-ID field based on payment method
+// Toggle manual transaction-ID field based on payment method.
+// Manual methods (UPI / Bank / Cheque) REQUIRE the Transaction ID so the
+// admin can verify the payment; live gateways verify automatically.
+// The tax-receipt & newsletter checkboxes are shown only when a payment
+// gateway is used (they are disabled while hidden so they are not submitted).
 const manualTxnField = document.getElementById('manualTxnField');
+const gatewayExtras = document.getElementById('gatewayExtras');
 function syncManualField() {
   const selected = document.querySelector('input[name="payment_method"]:checked');
   const isLive = selected && selected.dataset.live === '1';
   manualTxnField.style.display = isLive ? 'none' : '';
+  const txnInput = manualTxnField.querySelector('input[name="transaction_id"]');
+  if (txnInput) txnInput.required = !isLive;
+  if (gatewayExtras) {
+    gatewayExtras.style.display = isLive ? '' : 'none';
+    gatewayExtras.querySelectorAll('input').forEach(i => { i.disabled = !isLive; });
+  }
 }
 document.querySelectorAll('input[name="payment_method"]').forEach(r => r.addEventListener('change', syncManualField));
 syncManualField();

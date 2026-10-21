@@ -1,6 +1,7 @@
 <?php
 $page_title = 'Blog Posts';
 require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/includes/editor.php';
 
 $action = $_GET['action'] ?? 'list';
 $id = (int)($_GET['id'] ?? 0);
@@ -60,7 +61,7 @@ if ($action==='add'||$action==='edit') {
       <div class="form-group"><label>Category</label><input type="text" name="category" value="<?= e($row['category']) ?>" placeholder="Success Stories"></div>
     </div>
     <div class="form-group"><label>Excerpt (short preview)</label><textarea name="excerpt" rows="2"><?= e($row['excerpt']) ?></textarea></div>
-    <div class="form-group"><label>Content <span class="req">*</span></label><textarea name="content" rows="14" required><?= e($row['content']) ?></textarea><p class="help">HTML allowed. Use &lt;p&gt;, &lt;h2&gt;, &lt;blockquote&gt;, &lt;ul&gt;, &lt;strong&gt;, etc.</p></div>
+    <?= editor_field('content', $row['content'], 'Content <span class="req">*</span>', 420) ?>
     <div class="form-row">
       <div class="form-group"><label>Author</label><input type="text" name="author" value="<?= e($row['author']) ?>"></div>
       <div class="form-group"><label>Read Time</label><input type="text" name="read_time" value="<?= e($row['read_time']) ?>" placeholder="5 min read"></div>

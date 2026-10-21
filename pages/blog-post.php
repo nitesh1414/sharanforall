@@ -48,6 +48,9 @@ $extra_head = '<style>
   .article img{border-radius:10px;margin:1.5rem 0;max-width:100%}
   .article ul{margin:1rem 0 1.5rem 1.5rem;color:#444}
   .article ul li{list-style:disc;margin-bottom:.5rem;line-height:1.7}
+  .article ol{margin:1rem 0 1.5rem 1.5rem;color:#444}
+  .article ol li{list-style:decimal;margin-bottom:.5rem;line-height:1.7}
+  .article a{color:var(--primary);text-decoration:underline}
   .article strong{color:var(--dark)}
   .share{padding:1.5rem;background:#f5f5f0;border-radius:10px;margin-top:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
   .share-btns{display:flex;gap:.5rem}
@@ -85,6 +88,12 @@ $url_full = (isset($_SERVER['HTTPS'])?'https':'http') . '://' . $_SERVER['HTTP_H
     </div>
   </div>
 </section>
+
+<?php if ($flash): ?>
+  <div class="container" style="margin-top:1.5rem">
+    <div class="alert <?= e($flash['type']) ?>"><?= e($flash['msg']) ?></div>
+  </div>
+<?php endif; ?>
 
 <section class="sec-cream" style="padding:0 1rem 5rem">
   <div class="article-wrap">

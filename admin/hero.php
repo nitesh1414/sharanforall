@@ -388,7 +388,7 @@ $active_count = (int)$pdo->query("SELECT COUNT(*) FROM hero_slides WHERE status=
               <?php if ($r['image']): ?>
                 <img src="<?= BASE_URL.e($r['image']) ?>" style="width:100%;height:100%;object-fit:cover;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.1)">
               <?php else: ?>
-                <div style="width:100%;height:100%;background:linear-gradient(135deg,#2563eb,#f4a261);border-radius:6px;display:grid;place-items:center;color:#fff">?</div>
+                <div style="width:100%;height:100%;background:linear-gradient(135deg,#2563eb,#f4a261);border-radius:6px;display:grid;place-items:center;color:#fff">🖼️</div>
               <?php endif; ?>
               <?php if (($r['media_type'] ?? 'image') !== 'image'): ?>
                 <?php $mtIco=['video'=>'🎬','youtube'=>'▶️','vimeo'=>'🅥'][$r['media_type']] ?? '🖼️'; ?>

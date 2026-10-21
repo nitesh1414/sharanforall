@@ -56,6 +56,12 @@ require __DIR__ . '/../includes/public_header.php';
   </div>
 </section>
 
+<?php if ($flash): ?>
+  <div class="container" style="margin-top:1.5rem">
+    <div class="alert <?= e($flash['type']) ?>"><?= e($flash['msg']) ?></div>
+  </div>
+<?php endif; ?>
+
 <section class="sec-mist" style="text-align:center">
   <div class="container">
     <span class="tag"><?= e(t('programs_badge')) ?></span>
@@ -80,12 +86,12 @@ require __DIR__ . '/../includes/public_header.php';
       <div class="prog-grid <?= $reverse ? 'reverse' : '' ?>">
         <?php if ($has_img): ?>
           <div class="prog-img" style="background-image:url('<?= BASE_URL . e($p['image']) ?>')">
-            <span class="badge"><?= e($p['icon']) ?> Program <?= str_pad($i+1, 2, '0', STR_PAD_LEFT) ?></span>
+            <span class="badge"><?= e(icon_or($p['icon'], '📌')) ?> Program <?= str_pad($i+1, 2, '0', STR_PAD_LEFT) ?></span>
           </div>
         <?php else: ?>
           <div class="prog-img placeholder-img <?= $i % 2 ? 'alt' : '' ?>">
-            <div class="icon"><?= e($p['icon'] ?: '📌') ?></div>
-            <span class="badge"><?= e($p['icon']) ?> Program <?= str_pad($i+1, 2, '0', STR_PAD_LEFT) ?></span>
+            <div class="icon"><?= e(icon_or($p['icon'], '📌')) ?></div>
+            <span class="badge"><?= e(icon_or($p['icon'], '📌')) ?> Program <?= str_pad($i+1, 2, '0', STR_PAD_LEFT) ?></span>
           </div>
         <?php endif; ?>
 
@@ -134,7 +140,7 @@ require __DIR__ . '/../includes/public_header.php';
             <?php foreach ($courses as $c):
               $cn = current_lang()==='hi' && $c['course_name_hi'] ? $c['course_name_hi'] : $c['course_name']; ?>
               <li style="padding:.55rem 0;border-bottom:1px dashed #eee;display:flex;align-items:center;gap:.6rem;color:#444">
-                <span style="font-size:1.1rem;flex-shrink:0"><?= e($c['icon']) ?></span>
+                <span style="font-size:1.1rem;flex-shrink:0"><?= e(icon_or($c['icon'], '📚')) ?></span>
                 <span><?= e($cn) ?></span>
               </li>
             <?php endforeach; ?>

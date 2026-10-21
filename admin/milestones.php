@@ -118,7 +118,7 @@ $rows = $pdo->query("SELECT * FROM milestones ORDER BY display_order, id")->fetc
   <tr data-id="<?= $r['id'] ?>">
     <td style="cursor:grab;text-align:center;color:#bbb;font-size:1.2rem" class="drag-handle">⠿</td>
     <td><strong style="color:var(--primary)"><?= e($r['year']) ?></strong></td>
-    <td style="font-size:1.4rem"><?= e($r['icon']) ?></td>
+    <td style="font-size:1.4rem"><?= e(icon_or($r['icon'], '✦')) ?></td>
     <td><strong><?= e($r['title']) ?></strong></td>
     <td style="font-size:.85rem;color:#666;max-width:380px"><?= e(mb_strimwidth($r['description'], 0, 120, '...')) ?></td>
     <td><?= $r['is_highlight'] ? '⭐' : '' ?></td>

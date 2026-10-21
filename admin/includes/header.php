@@ -73,6 +73,7 @@ $page_title = $page_title ?? 'Dashboard';
     <a href="<?= ADMIN_URL ?>gallery.php" class="<?= $current=='gallery.php'?'active':'' ?>"><span class="icon">🖼️</span> Gallery</a>
     <a href="<?= ADMIN_URL ?>team.php" class="<?= $current=='team.php'?'active':'' ?>"><span class="icon">👥</span> Team Members</a>
     <a href="<?= ADMIN_URL ?>testimonials.php" class="<?= $current=='testimonials.php'?'active':'' ?>"><span class="icon">💬</span> Testimonials</a>
+    <a href="<?= ADMIN_URL ?>offices.php" class="<?= $current=='offices.php'?'active':'' ?>"><span class="icon">📍</span> Where We Serve</a>
 
     <div class="menu-label">Submissions</div>
     <a href="<?= ADMIN_URL ?>donations.php" class="<?= $current=='donations.php'?'active':'' ?>"><span class="icon">💝</span> Donations<?php if($counts['donations_pending']): ?><span class="badge"><?= $counts['donations_pending'] ?></span><?php endif; ?></a>

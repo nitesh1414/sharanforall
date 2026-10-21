@@ -259,7 +259,7 @@ $stats = [
   <?php else: ?>
   <div class="table-wrap"><table>
     <thead><tr>
-      <th>Date</th><th>Donor</th><th>Amount</th><th>Type</th><th>Purpose</th><th>Method</th><th>Status</th><th>Receipt</th><th>Actions</th>
+      <th>Date</th><th>Donor</th><th>Amount</th><th>Type</th><th>Purpose</th><th>Method</th><th>Txn ID</th><th>Status</th><th>Receipt</th><th>Actions</th>
     </tr></thead>
     <tbody>
     <?php foreach ($rows as $r):
@@ -274,6 +274,7 @@ $stats = [
         <td><span class="status-badge" style="background:#e8eef5;color:#555"><?= e($r['donation_type']) ?></span></td>
         <td style="font-size:.85rem"><?= e($r['purpose']) ?></td>
         <td style="font-size:.82rem"><?= e(strtoupper(str_replace('_',' ',$r['payment_method']))) ?></td>
+        <td><?= !empty($r['transaction_id']) ? '<code style="font-size:.75rem" title="'.e($r['transaction_id']).'">'.e(mb_strimwidth($r['transaction_id'],0,16,'…')).'</code>' : '<em style="color:#888">—</em>' ?></td>
         <td>
           <span class="status-badge status-<?= $r['payment_status']==='completed'?'active':($r['payment_status']==='pending'?'new':'inactive') ?>"><?= e($r['payment_status']) ?></span>
         </td>

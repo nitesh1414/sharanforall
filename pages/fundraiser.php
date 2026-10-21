@@ -43,7 +43,7 @@ $extra_head = '<style>
   .fr-hero h1{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;line-height:1.2;margin:.6rem 0 .8rem;max-width:900px}
   .fr-hero .badge{display:inline-block;background:var(--accent);padding:.4rem 1rem;border-radius:50px;font-size:.85rem;font-weight:600}
 
-  .layout{display:grid;grid-template-columns:2fr 1fr;gap:2rem;margin-top:-4rem;position:relative;z-index:3}
+  .layout{display:grid;grid-template-columns:2fr 1fr;gap:2rem;margin-top:0;position:relative;z-index:3}
   .main-col{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:2.5rem}
   .organizer-box{display:flex;align-items:center;gap:1rem;padding-bottom:1.5rem;border-bottom:1px solid #eee;margin-bottom:1.5rem}
   .org-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;display:grid;place-items:center;font-weight:700;font-size:1.4rem;flex-shrink:0}
@@ -71,6 +71,20 @@ $extra_head = '<style>
   .contribute-form button[type=submit]{width:100%;padding:.95rem;background:linear-gradient(135deg,var(--accent),var(--accent-dark));color:#fff;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:1rem;letter-spacing:.5px;transition:.2s}
   .contribute-form button[type=submit]:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(231,111,81,.35)}
 
+  /* BANK DETAILS (left) + QR CODE (right) side by side */
+  .bank-details{background:linear-gradient(135deg,#fffaf0,#fff);padding:2rem;border-radius:14px;border:2px dashed var(--accent)}
+  .bank-details h3{color:var(--primary-dark);margin-bottom:.6rem;font-size:16px}
+  .bank-layout{display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:2rem;align-items:center}
+  .bank-layout.no-qr{grid-template-columns:1fr}
+  .bank-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start}
+  .bank-grid h4{color:var(--accent-dark);margin-bottom:.6rem;font-size:14px}
+  .bank-grid ul{list-style:none;padding:0;margin:0}
+  .bank-grid li{padding:.45rem 0;border-bottom:1px dashed #ddd;font-size:14px;display:grid;grid-template-columns:1fr 1fr;gap:.75rem;align-items:center}
+  .bank-grid li strong{color:var(--primary-dark);text-align:right;word-break:break-all}
+  .bank-qr{text-align:center;background:#fff;border:1px solid #eee;border-radius:12px;padding:1.2rem;box-shadow:var(--shadow)}
+  .bank-qr img{max-width:100%;border-radius:8px}
+  .bank-qr p{font-size:.78rem;color:var(--gray);margin-top:.5rem}
+
   .contribs-card{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:1.5rem}
   .contribs-card h3{color:var(--primary-dark);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid var(--accent);display:inline-block}
   .contrib-row{padding:.8rem 0;border-bottom:1px solid #f0f0f0;display:flex;gap:.7rem;align-items:flex-start}
@@ -91,9 +105,10 @@ $extra_head = '<style>
   .alert.error{background:#fdecea;color:#c0392b;border-left:4px solid #e74c3c}
 
   @media(max-width:880px){
-    .layout{grid-template-columns:1fr;margin-top:-2rem}
+    .layout{grid-template-columns:1fr;margin-top:0}
     .progress-card{position:static}
     .main-col{padding:1.5rem}
+    .bank-layout,.bank-grid{grid-template-columns:1fr}
   }
 </style>';
 
@@ -110,7 +125,17 @@ $share_url = (isset($_SERVER['HTTPS'])?'https':'http') . '://' . $_SERVER['HTTP_
   </div>
 </section>
 
-<section class="sec-cream" style="padding:0 0 5rem">
+<?php $bd = bank_details(); $bank_card = bank_card_html($bd); ?>
+<!-- BANK DETAILS + QR (managed from Admin → Site Settings) — shown FIRST, before the contribute/payment form -->
+<?php if ($bank_card): ?>
+<section class="sec-sand" style="padding:2.5rem 0">
+  <div class="container" style="max-width:1000px">
+    <?= $bank_card ?>
+  </div>
+</section>
+<?php endif; ?>
+
+<section class="sec-cream" style="padding:2.5rem 0 5rem">
   <div class="container">
 
     <?php if ($flash): ?>
@@ -181,10 +206,12 @@ $share_url = (isset($_SERVER['HTTPS'])?'https':'http') . '://' . $_SERVER['HTTP_
           <input type="number" name="amount" id="contribAmount" placeholder="<?= $sym ?> Custom amount" min="1" required>
           <input type="text" name="donor_name" placeholder="Your Name *" required>
           <input type="email" name="email" placeholder="Email (for receipt)">
+          <input type="text" name="transaction_id" placeholder="Transaction / UPI Reference ID *" required>
+          <p class="help" style="font-size:.75rem;color:var(--gray);margin:-.2rem 0 .6rem">Required — pay using the bank details / QR code above, then enter the UTR / bank reference here so we can verify your contribution.</p>
           <textarea name="message" placeholder="Message of support (optional)" rows="2"></textarea>
           <label><input type="checkbox" name="is_anonymous" value="1"> Donate anonymously</label>
           <button type="submit">💝 Contribute <?= $sym ?> →</button>
-          <p style="font-size:.75rem;color:var(--gray);text-align:center;margin-top:.5rem">You'll receive bank/UPI details to complete payment.</p>
+          <p style="font-size:.75rem;color:var(--gray);text-align:center;margin-top:.5rem">Pay via the bank details / QR code above, then enter your Transaction ID — we verify every payment manually. 🔒</p>
         </form>
         <?php endif; ?>
 

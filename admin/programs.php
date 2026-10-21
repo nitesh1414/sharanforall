@@ -194,7 +194,7 @@ $rows = $pdo->query("SELECT * FROM programs ORDER BY display_order, id")->fetchA
             <?php if ($r['image']): ?>
               <img src="<?= BASE_URL . e($r['image']) ?>" class="thumb-sm" alt="">
             <?php else: ?>
-              <div class="thumb-sm" style="display:grid;place-items:center;font-size:1.4rem;background:linear-gradient(135deg,#2563eb,#f4a261);color:#fff"><?= e($r['icon']) ?></div>
+              <div class="thumb-sm" style="display:grid;place-items:center;font-size:1.4rem;background:linear-gradient(135deg,#2563eb,#f4a261);color:#fff"><?= e(icon_or($r['icon'], '📚')) ?></div>
             <?php endif; ?>
           </td>
           <td><strong><?= e($r['title']) ?></strong><br><small style="color:#888"><?= e($r['slug']) ?></small></td>

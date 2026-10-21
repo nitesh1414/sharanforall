@@ -3,6 +3,16 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/functions.php';
 require_once __DIR__ . '/i18n.php';
 $flash = flash_get();
+// Fallback confirmation when the session flash is unavailable (e.g. cookies
+// blocked): the submit endpoints also flag the result in the URL
+// (?submitted=1 / ?failed=1), so the message is never blank.
+if (!$flash) {
+    if (isset($_GET['submitted'])) {
+        $flash = ['type' => 'success', 'msg' => t('msg_submitted', '✓ Thank you! Your submission has been received.')];
+    } elseif (isset($_GET['failed'])) {
+        $flash = ['type' => 'error', 'msg' => t('msg_failed', '❌ Sorry, something went wrong. Please try again or contact us.')];
+    }
+}
 $current_page = $current_page ?? '';
 $page_title = $page_title ?? 'Sharan Foundation';
 $page_desc = $page_desc ?? 'A Christian charity serving India & UK through education, shelter and faith.';

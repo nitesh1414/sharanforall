@@ -184,3 +184,20 @@ table td .actions{display:flex;gap:.4rem}
 .lang-panel[data-lang-panel="hi"]{display:none !important}
 .form-group:has(input[name$="_hi"]),
 .form-group:has(textarea[name$="_hi"]){display:none !important}
+
+/* ===== WYSIWYG editor (admin/includes/editor.php) ===== */
+.wysiwyg{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
+.wysiwyg-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:.25rem;padding:.5rem;background:#f7f8fa;border-bottom:1px solid var(--border)}
+.wysiwyg-toolbar button{border:1px solid var(--border);background:#fff;border-radius:6px;padding:.35rem .6rem;font-size:.82rem;cursor:pointer;line-height:1.2;color:#444;font-family:inherit}
+.wysiwyg-toolbar button:hover{background:#eaf2ff;border-color:var(--primary);color:var(--primary-dark)}
+.wysiwyg-toolbar button:disabled{opacity:.5;cursor:wait}
+.wysiwyg-sep{width:1px;align-self:stretch;background:var(--border);margin:0 .2rem}
+.wysiwyg-area{min-height:380px;padding:1rem 1.2rem;outline:none;overflow-y:auto;line-height:1.7;color:#333;background:#fff}
+.wysiwyg-area:focus{box-shadow:inset 0 0 0 2px rgba(37,99,235,.18)}
+.wysiwyg-area img{max-width:100%;height:auto;border-radius:8px}
+.wysiwyg-area blockquote{border-left:4px solid var(--accent);margin:1rem 0;padding:.6rem 1rem;background:#fffaf0;border-radius:0 8px 8px 0;color:#5b4a2c}
+.wysiwyg-area h2{color:var(--primary-dark);margin:1.4rem 0 .6rem;font-size:1.35rem}
+.wysiwyg-area h3{color:var(--dark);margin:1.2rem 0 .5rem;font-size:1.1rem}
+.wysiwyg-area a{color:var(--primary);text-decoration:underline}
+.wysiwyg .wysiwyg-source{display:none}
+.wysiwyg .help{margin:.5rem 0 0}

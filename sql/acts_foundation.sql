@@ -129,6 +129,28 @@ ALTER TABLE `settings`
   ADD COLUMN IF NOT EXISTS `motto_hi`               VARCHAR(255) NULL,
   ADD COLUMN IF NOT EXISTS `locations_served`       VARCHAR(255) NULL;
 
+-- ============================================================
+-- BANK DETAILS + QR CODE (v12)
+-- Admin → Site Settings. Shown on the Donate page and the
+-- Fundraising pages so donors can pay via direct bank
+-- transfer / UPI. Safe to re-run (ADD COLUMN IF NOT EXISTS).
+-- ============================================================
+ALTER TABLE `settings`
+  ADD COLUMN IF NOT EXISTS `bank_in_name`         VARCHAR(150) NULL,
+  ADD COLUMN IF NOT EXISTS `bank_in_account_name` VARCHAR(150) NULL,
+  ADD COLUMN IF NOT EXISTS `bank_in_account_no`   VARCHAR(50)  NULL,
+  ADD COLUMN IF NOT EXISTS `bank_in_ifsc`         VARCHAR(20)  NULL,
+  ADD COLUMN IF NOT EXISTS `bank_in_branch`       VARCHAR(150) NULL,
+  ADD COLUMN IF NOT EXISTS `bank_in_upi`          VARCHAR(100) NULL,
+  ADD COLUMN IF NOT EXISTS `bank_uk_name`         VARCHAR(150) NULL,
+  ADD COLUMN IF NOT EXISTS `bank_uk_account_name` VARCHAR(150) NULL,
+  ADD COLUMN IF NOT EXISTS `bank_uk_account_no`   VARCHAR(50)  NULL,
+  ADD COLUMN IF NOT EXISTS `bank_uk_sort_code`    VARCHAR(20)  NULL,
+  ADD COLUMN IF NOT EXISTS `bank_uk_branch`       VARCHAR(150) NULL,
+  ADD COLUMN IF NOT EXISTS `bank_uk_charity_no`   VARCHAR(50)  NULL,
+  ADD COLUMN IF NOT EXISTS `bank_qr_image`        VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS `bank_note`            TEXT NULL;
+
 -- Seed settings row (only on first install)
 INSERT INTO `settings` (`id`,`site_title`,`tagline`,`email_in`,`email_uk`,`phone_in`,`phone_uk`,`address_in`,`address_uk`,`about_short`,`mission`,`vision`,`values_text`,`default_language`,`gateway_mode`)
 SELECT 1,'Sharan Foundation','Hope • Care • Transformation',
@@ -497,6 +519,76 @@ CREATE TABLE IF NOT EXISTS `fundraiser_contributions` (
   INDEX idx_fundraiser (`fundraiser_id`),
   FOREIGN KEY (`fundraiser_id`) REFERENCES `fundraisers`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
+-- ============================================================
+-- TRANSACTION ID ON FUNDRAISER CONTRIBUTIONS (v13)
+-- Donors pay via bank/UPI (details + QR shown on the page) and
+-- submit the Transaction / Reference ID, which the admin uses
+-- to verify the payment. Safe to re-run.
+-- ============================================================
+ALTER TABLE `fundraiser_contributions`
+  ADD COLUMN IF NOT EXISTS `transaction_id` VARCHAR(150) NULL;
+
+-- ============================================================
+-- PAYMENT GATEWAY VISIBILITY (v14)
+-- Admin can show/hide the payment gateway options on the donation
+-- page. When hidden, only bank details + QR are shown (after the
+-- donor information) and donors pay via bank transfer / UPI.
+-- Safe to re-run.
+-- ============================================================
+ALTER TABLE `settings`
+  ADD COLUMN IF NOT EXISTS `donate_show_gateways` TINYINT(1) NOT NULL DEFAULT 1;
+
+-- ============================================================
+-- WHERE WE SERVE — OFFICES (v14)
+-- Admin-managed list of office locations (add/update/delete from
+-- the admin panel). Shown on the Contact page. Seeded with the
+-- India & UK offices. Safe to re-run.
+-- ============================================================
+CREATE TABLE IF NOT EXISTS `offices` (
+  `id`            INT AUTO_INCREMENT PRIMARY KEY,
+  `title`         VARCHAR(150) NOT NULL,
+  `country`       VARCHAR(100) DEFAULT '',
+  `address`       TEXT,
+  `phone`         VARCHAR(50) DEFAULT '',
+  `email`         VARCHAR(150) DEFAULT '',
+  `hours`         VARCHAR(150) DEFAULT '',
+  `map_link`      VARCHAR(255) DEFAULT '',
+  `icon`          VARCHAR(10) DEFAULT '📍',
+  `display_order` INT DEFAULT 0,
+  `status`        ENUM('active','inactive') DEFAULT 'active',
+  `created_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at`    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_status (`status`)
+) ENGINE=InnoDB;
+
+INSERT INTO `offices` (`title`,`country`,`address`,`phone`,`email`,`hours`,`icon`,`display_order`,`status`)
+SELECT * FROM (
+  SELECT '🇮🇳 India Office' AS title,
+         'India' AS country,
+         'Sharan Foundation Campus, Sangvi, Pune, India' AS address,
+         '+91 98765 43210' AS phone,
+         'india@sharanforall.org' AS email,
+         'Mon - Sat: 9:00 AM - 6:00 PM IST' AS hours,
+         '🇮🇳' AS icon,
+         1 AS display_order,
+         'active' AS status
+) AS seed
+WHERE NOT EXISTS (SELECT 1 FROM `offices`);
+
+INSERT INTO `offices` (`title`,`country`,`address`,`phone`,`email`,`hours`,`icon`,`display_order`,`status`)
+SELECT * FROM (
+  SELECT '🇬🇧 UK Office' AS title,
+         'United Kingdom' AS country,
+         'Sharan Foundation UK, London, United Kingdom' AS address,
+         '+44 20 1234 5678' AS phone,
+         'uk@sharanforall.org' AS email,
+         'Mon - Fri: 9:00 AM - 5:00 PM GMT' AS hours,
+         '🇬🇧' AS icon,
+         2 AS display_order,
+         'active' AS status
+) AS seed
+WHERE NOT EXISTS (SELECT 1 FROM `offices` WHERE `country` = 'United Kingdom');
 
 INSERT IGNORE INTO `fundraisers` (`id`,`organizer_name`,`organizer_email`,`organizer_phone`,`organizer_bio`,`title`,`slug`,`cause`,`story`,`goal_amount`,`currency`,`raised_amount`,`start_date`,`end_date`,`status`,`is_featured`) VALUES
 (1,'Priya Sharma','priya.fundraiser@example.com','+91 98765 11111','Software engineer turning 30 this year.','My 30th Birthday Fundraiser for Girls'' Education','priya-30th-birthday-girls','Girl Child Education','Instead of birthday gifts, I want to fund education for 10 rural girls.',50000,'INR',32500,'2026-05-01','2026-06-30','active',1),
