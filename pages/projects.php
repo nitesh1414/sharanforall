@@ -60,6 +60,12 @@ require __DIR__ . '/../includes/public_header.php';
   </div>
 </section>
 
+<?php if ($flash): ?>
+  <div class="container" style="margin-top:1.5rem">
+    <div class="alert <?= e($flash['type']) ?>"><?= e($flash['msg']) ?></div>
+  </div>
+<?php endif; ?>
+
 <section class="sec-mist">
   <div class="container">
     <div class="section-head">

@@ -28,6 +28,17 @@ if ($amount < 1) {
     redirect(BASE_URL . 'pages/donate.php#donation-form');
 }
 
+// ---- Payment method + Transaction ID ----
+// Manual (offline) methods REQUIRE the Transaction / Reference ID so the
+// admin can verify the payment; live gateways verify automatically.
+$payment_method = in_array($_POST['payment_method'] ?? '', ['upi','razorpay','stripe','paypal','bank_transfer','cheque','cash','other'])
+    ? $_POST['payment_method'] : 'bank_transfer';
+$manual_methods = ['upi','bank_transfer','cheque','cash','other'];
+if (in_array($payment_method, $manual_methods, true) && trim($_POST['transaction_id'] ?? '') === '') {
+    flash_set('error', 'Please enter the Transaction / Reference ID (UPI UTR or bank reference) so we can verify your payment.');
+    redirect(BASE_URL . 'pages/donate.php#donation-form');
+}
+
 // ---- Data ----
 $data = [
     'donor_name'       => trim($_POST['donor_name']),
@@ -44,7 +55,7 @@ $data = [
     'donation_type'    => in_array($_POST['donation_type'] ?? '', ['one-time','monthly','yearly']) ? $_POST['donation_type'] : 'one-time',
     'purpose'          => trim($_POST['purpose'] ?? 'Where Most Needed'),
     'message'          => trim($_POST['message'] ?? ''),
-    'payment_method'   => in_array($_POST['payment_method'] ?? '', ['upi','razorpay','stripe','paypal','bank_transfer','cheque','cash','other']) ? $_POST['payment_method'] : 'bank_transfer',
+    'payment_method'   => $payment_method,
     'payment_status'   => 'pending',  // admin marks as completed after verifying
     'transaction_id'   => trim($_POST['transaction_id'] ?? '') ?: null,
     'is_anonymous'     => isset($_POST['is_anonymous']) ? 1 : 0,

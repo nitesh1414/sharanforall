@@ -105,6 +105,7 @@ return [
     'lets_connect'    => "Let's Connect",
     'india_office'    => '🇮🇳 India Office',
     'uk_office'       => '🇬🇧 UK Office',
+    'where_we_serve'  => 'Where We Serve',
     'address'         => 'Address',
     'phone'           => 'Phone',
     'email'           => 'Email',
@@ -180,6 +181,8 @@ return [
     'invalid_email'   => 'Please enter a valid email address.',
     'invalid_amount'  => 'Please enter a valid donation amount.',
     'fill_required'   => 'Please fill all required fields.',
+    'msg_submitted'   => '✓ Thank you! Your submission has been received.',
+    'msg_failed'      => '❌ Sorry, something went wrong. Please try again or contact us.',
 
     // DONATION PAGE
     'page_donate'         => 'Make a Donation',

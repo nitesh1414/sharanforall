@@ -241,3 +241,9 @@ footer input,footer button.btn{font-size:var(--fs-btn)}
   }
   header.nav .logo-name,header.nav .logo-text small{white-space:nowrap}
 }
+
+/* ===== Flash / confirmation alerts (shown after form submissions) ===== */
+.alert{padding:1rem 1.4rem;border-radius:10px;margin-bottom:1.5rem;font-weight:500}
+.alert.success{background:#e8f5ef;color:#1d4ed8;border-left:4px solid #2563eb}
+.alert.error{background:#fdecea;color:#c0392b;border-left:4px solid #e74c3c}
+.alert.info{background:#fef7e0;color:#5b4a2c;border-left:4px solid #d4a017}

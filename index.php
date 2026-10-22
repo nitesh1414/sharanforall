@@ -65,6 +65,12 @@ $extra_head = '<link rel="stylesheet" href="' . BASE_URL . 'css/home.css">';
 require __DIR__ . '/includes/public_header.php';
 ?>
 
+<?php if ($flash): ?>
+  <div class="container" style="margin-top:1.5rem">
+    <div class="alert <?= e($flash['type']) ?>"><?= e($flash['msg']) ?></div>
+  </div>
+<?php endif; ?>
+
 <!-- HERO CAROUSEL -->
 <section class="hero hero-carousel trans-<?= e($carousel_config['transition']) ?>" id="home"
          data-autoplay="<?= $carousel_config['autoplay'] ?>"
@@ -352,7 +358,7 @@ require __DIR__ . '/includes/public_header.php';
     <div class="marquee-content"<?= $copy === 1 ? ' aria-hidden="true"' : '' ?>>
       <?php foreach ($marquees as $m): ?>
         <span class="marquee-item">
-          <?php if (!empty($m['icon'])): ?><span class="mq-ico"><?= e($m['icon']) ?></span><?php endif; ?>
+          <span class="mq-ico"><?= e(icon_or($m['icon'], '✦')) ?></span>
           <span class="mq-text"><?= e(tr_field($m, 'text')) ?></span>
         </span>
         <span class="marquee-sep" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></span>
@@ -423,8 +429,8 @@ require __DIR__ . '/includes/public_header.php';
       ?>
         <div class="program">
           <div class="program-img" style="<?= $has_img ? "background-image:url('".BASE_URL.e($p['image'])."')" : 'background:'.$bg_colors[$i % 4] ?>">
-            <?php if (!$has_img): ?><span style="z-index:1;text-shadow:0 4px 14px rgba(0,0,0,.3)"><?= e($p['icon']) ?></span><?php endif; ?>
-            <div class="icon-circle"><?= e($p['icon']) ?></div>
+            <?php if (!$has_img): ?><span style="z-index:1;text-shadow:0 4px 14px rgba(0,0,0,.3)"><?= e(icon_or($p['icon'], '📚')) ?></span><?php endif; ?>
+            <div class="icon-circle"><?= e(icon_or($p['icon'], '📚')) ?></div>
           </div>
           <div class="program-body">
             <h3><?= e(tr_field($p, 'title')) ?></h3>

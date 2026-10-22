@@ -206,7 +206,7 @@ if (isset($_GET['view']) && $id) {
       <div class="empty"><div class="ico">💝</div><h3>No contributions yet</h3><p>Contributions to this fundraiser will appear here.</p></div>
     <?php else: ?>
     <div class="table-wrap"><table>
-      <thead><tr><th>Donor</th><th>Amount</th><th>Message</th><th>Status</th><th>Date</th></tr></thead>
+      <thead><tr><th>Donor</th><th>Amount</th><th>Txn ID</th><th>Message</th><th>Status</th><th>Date</th></tr></thead>
       <tbody>
         <?php foreach ($contribs as $c):
           $csym = $c['currency']==='INR'?'₹':($c['currency']==='GBP'?'£':'$'); ?>
@@ -214,6 +214,7 @@ if (isset($_GET['view']) && $id) {
           <td><strong><?= $c['is_anonymous'] || empty($c['donor_name']) ? '🔒 Anonymous' : e($c['donor_name']) ?></strong>
               <?php if ($c['email']): ?><br><small style="color:#888"><?= e($c['email']) ?></small><?php endif; ?></td>
           <td><strong style="color:var(--primary-dark)"><?= $csym . number_format($c['amount'],0) ?></strong></td>
+          <td><?= !empty($c['transaction_id']) ? '<code style="font-size:.75rem" title="'.e($c['transaction_id']).'">'.e(mb_strimwidth($c['transaction_id'],0,16,'…')).'</code>' : '<em style="color:#888">—</em>' ?></td>
           <td style="font-size:.88rem;color:#666;font-style:italic"><?= $c['message'] ? '"'.e(mb_strimwidth($c['message'],0,120,'...')).'"' : '—' ?></td>
           <td><span class="status-badge status-<?= $c['payment_status']==='completed'?'active':'new' ?>"><?= e($c['payment_status']) ?></span></td>
           <td><small><?= time_ago($c['contributed_at']) ?></small></td>

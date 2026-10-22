@@ -121,7 +121,7 @@ $total_courses = count($rows);
         <tbody>
         <?php foreach ($courses as $c): ?>
           <tr>
-            <td style="font-size:1.4rem;text-align:center"><?= e($c['icon']) ?></td>
+            <td style="font-size:1.4rem;text-align:center"><?= e(icon_or($c['icon'], '📚')) ?></td>
             <td><strong><?= e($c['course_name']) ?></strong></td>
             <td style="font-size:.85rem;color:#666"><?= e(mb_strimwidth($c['description'] ?? '', 0, 100, '...')) ?: '—' ?></td>
             <td><?= (int)$c['display_order'] ?></td>

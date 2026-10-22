@@ -125,6 +125,10 @@ require __DIR__ . '/../includes/public_header.php';
 ?>
 
 <div class="manage-wrap">
+  <?php if ($flash): ?>
+    <div class="alert <?= e($flash['type']) ?>"><?= e($flash['msg']) ?></div>
+  <?php endif; ?>
+
   <?php if ($action_msg): ?>
     <div class="alert <?= e($action_type) ?>"><?= e($action_msg) ?></div>
   <?php endif; ?>

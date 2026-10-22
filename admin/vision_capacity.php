@@ -153,7 +153,7 @@ $total = array_sum(array_map(fn($r) => (int)$r['capacity'], $rows));
       <?php foreach ($rows as $r): ?>
         <tr>
           <td><strong style="color:#666"><?= (int)$r['display_order'] ?></strong></td>
-          <td style="font-size:1.4rem"><?= e($r['icon']) ?></td>
+          <td style="font-size:1.4rem"><?= e(icon_or($r['icon'], '👥')) ?></td>
           <td><strong><?= e($r['category']) ?></strong></td>
           <td style="color:#888"><?= $r['category_hi'] ? e($r['category_hi']) : '<span style="color:#bbb">—</span>' ?></td>
           <td><span class="status-badge" style="background:#eaf2ff;color:#1d4ed8"><?= number_format((int)$r['capacity']) ?>+</span></td>

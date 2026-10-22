@@ -163,7 +163,7 @@ foreach ($rows as $r) if ($r['status']==='active') $active_count++;
       <?php foreach ($rows as $r): ?>
         <tr>
           <td><strong style="color:#666"><?= (int)$r['display_order'] ?></strong></td>
-          <td style="font-size:1.4rem"><?= $r['icon'] ? e($r['icon']) : '<span style="color:#bbb">—</span>' ?></td>
+          <td style="font-size:1.4rem"><?= e(icon_or($r['icon'], '✦')) ?></td>
           <td><strong><?= e($r['text']) ?></strong></td>
           <td style="color:#888"><?= $r['text_hi'] ? e($r['text_hi']) : '<span style="color:#bbb">—</span>' ?></td>
           <td>

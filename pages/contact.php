@@ -3,12 +3,33 @@ require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/functions.php';
 
 require_once __DIR__ . '/../includes/i18n.php';
+
+// Where We Serve — admin-managed offices (Admin → Where We Serve).
+// Falls back to the legacy Site Settings office fields if the table is missing.
+try {
+    $offices = $pdo->query("SELECT * FROM offices WHERE status='active' ORDER BY display_order, id")->fetchAll();
+    $offices_table_ok = true;
+} catch (Throwable $e) {
+    $offices = [];
+    $offices_table_ok = false;
+}
+if (!$offices_table_ok) {
+    $offices = [
+        ['title'=>t('india_office'),'country'=>'India','address'=>get_setting('address_in'),'phone'=>get_setting('phone_in'),'email'=>get_setting('email_in'),'hours'=>t('india_hours'),'icon'=>'🇮🇳'],
+        ['title'=>t('uk_office'),'country'=>'United Kingdom','address'=>get_setting('address_uk'),'phone'=>get_setting('phone_uk'),'email'=>get_setting('email_uk'),'hours'=>t('uk_hours'),'icon'=>'🇬🇧'],
+    ];
+}
+
 $page_title = t('page_contact');
 $page_desc = 'Get in touch with Sharan Foundation in India or UK. Donate, volunteer, or partner with us.';
 $current_page = 'contact';
 $extra_head = '<style>
   .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem}
   .contact-info h3{color:var(--primary-dark);margin-bottom:1.2rem;font-size:16px;padding-bottom:.5rem;border-bottom:2px solid var(--accent);display:inline-block}
+  .office-card{background:#fff;border-radius:12px;box-shadow:var(--shadow);padding:1.4rem 1.6rem;margin-bottom:1.4rem;border-top:3px solid var(--accent)}
+  .office-card h4{color:var(--primary-dark);font-size:15px;margin-bottom:.9rem}
+  .office-card .contact-item{margin-bottom:1rem}
+  .office-card .contact-item:last-child{margin-bottom:0}
   .contact-item{display:flex;gap:1rem;margin-bottom:1.4rem;align-items:flex-start}
   .contact-item .ico{width:45px;height:45px;border-radius:10px;background:rgba(37,99,235,.1);color:var(--primary);display:grid;place-items:center;font-size:1.2rem;flex-shrink:0}
   .contact-item h4{color:var(--dark);margin-bottom:.2rem;font-size:14px}
@@ -63,17 +84,18 @@ require __DIR__ . '/../includes/public_header.php';
 
     <div class="contact-grid">
       <div class="contact-info">
-        <h3><?= e(t('india_office')) ?></h3>
-        <div class="contact-item"><div class="ico">📍</div><div><h4><?= e(t('address')) ?></h4><p><?= nl2br(e(get_setting('address_in'))) ?></p></div></div>
-        <div class="contact-item"><div class="ico">📞</div><div><h4><?= e(t('phone')) ?></h4><p><?= e(get_setting('phone_in')) ?></p></div></div>
-        <div class="contact-item"><div class="ico">📧</div><div><h4><?= e(t('email')) ?></h4><p><?= e(get_setting('email_in')) ?></p></div></div>
-        <div class="contact-item"><div class="ico">⏰</div><div><h4><?= e(t('office_hours')) ?></h4><p><?= e(t('india_hours')) ?></p></div></div>
-
-        <h3 style="margin-top:2.5rem"><?= e(t('uk_office')) ?></h3>
-        <div class="contact-item"><div class="ico">📍</div><div><h4><?= e(t('address')) ?></h4><p><?= nl2br(e(get_setting('address_uk'))) ?></p></div></div>
-        <div class="contact-item"><div class="ico">📞</div><div><h4><?= e(t('phone')) ?></h4><p><?= e(get_setting('phone_uk')) ?></p></div></div>
-        <div class="contact-item"><div class="ico">📧</div><div><h4><?= e(t('email')) ?></h4><p><?= e(get_setting('email_uk')) ?></p></div></div>
-        <div class="contact-item"><div class="ico">⏰</div><div><h4><?= e(t('office_hours')) ?></h4><p><?= e(t('uk_hours')) ?></p></div></div>
+        <h3>📍 <?= e(t('where_we_serve')) ?></h3>
+        <?php if ($offices): foreach ($offices as $o): ?>
+        <div class="office-card">
+          <h4><?= e(icon_or($o['icon'] ?? '', '📍')) ?> <?= e($o['title']) ?></h4>
+          <?php if (!empty($o['address'])): ?><div class="contact-item"><div class="ico">📍</div><div><h4><?= e(t('address')) ?></h4><p><?= nl2br(e($o['address'])) ?></p></div></div><?php endif; ?>
+          <?php if (!empty($o['phone'])): ?><div class="contact-item"><div class="ico">📞</div><div><h4><?= e(t('phone')) ?></h4><p><?= e($o['phone']) ?></p></div></div><?php endif; ?>
+          <?php if (!empty($o['email'])): ?><div class="contact-item"><div class="ico">📧</div><div><h4><?= e(t('email')) ?></h4><p><?= e($o['email']) ?></p></div></div><?php endif; ?>
+          <?php if (!empty($o['hours'])): ?><div class="contact-item"><div class="ico">⏰</div><div><h4><?= e(t('office_hours')) ?></h4><p><?= e($o['hours']) ?></p></div></div><?php endif; ?>
+        </div>
+        <?php endforeach; else: ?>
+        <p style="color:var(--ink-muted);font-size:14px">No offices listed yet.</p>
+        <?php endif; ?>
       </div>
 
       <form action="<?= BASE_URL ?>api/submit_contact.php" method="post" class="contact-form">
@@ -97,8 +119,7 @@ require __DIR__ . '/../includes/public_header.php';
         </div>
         <select name="office" required>
           <option value=""><?= e(t('preferred_office')) ?> *</option>
-          <option>India Office</option>
-          <option>UK Office</option>
+          <?php foreach ($offices as $o): ?><option><?= e($o['title']) ?></option><?php endforeach; ?>
           <option>Either</option>
         </select>
         <textarea name="message" placeholder="<?= e(t('your_message')) ?> *" required></textarea>

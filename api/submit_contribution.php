@@ -29,6 +29,14 @@ if (!$is_anon) {
     if ($email && !filter_var($email, FILTER_VALIDATE_EMAIL)) { flash_set('error', t('invalid_email')); redirect(BASE_URL.'pages/fundraiser.php?slug='.$f['slug']); }
 }
 
+// Transaction / Reference ID is required — donors pay via bank/UPI (details
+// + QR shown on the page) and the admin verifies this ID to confirm payment.
+$transaction_id = trim($_POST['transaction_id'] ?? '');
+if ($transaction_id === '') {
+    flash_set('error', 'Please enter the Transaction / Reference ID (UPI UTR or bank reference) so we can verify your payment.');
+    redirect(BASE_URL.'pages/fundraiser.php?slug='.$f['slug'].'#contribute');
+}
+
 $data = [
     'fundraiser_id'  => $fundraiser_id,
     'donor_name'     => $is_anon ? 'Anonymous' : $donor_name,
@@ -38,17 +46,28 @@ $data = [
     'message'        => trim($_POST['message'] ?? ''),
     'is_anonymous'   => $is_anon,
     'payment_status' => 'pending', // admin marks completed after verifying payment
+    'transaction_id' => $transaction_id,
 ];
 
 try {
     $cols = implode(',', array_keys($data));
     $place = ':' . implode(',:', array_keys($data));
-    $pdo->prepare("INSERT INTO fundraiser_contributions ($cols) VALUES ($place)")->execute($data);
+    try {
+        $pdo->prepare("INSERT INTO fundraiser_contributions ($cols) VALUES ($place)")->execute($data);
+    } catch (Throwable $e) {
+        // transaction_id column may be missing on un-migrated installs —
+        // retry without it (the ID is still saved on the mirrored donation
+        // below and emailed to the donor). Run sql/acts_foundation.sql to add it.
+        unset($data['transaction_id']);
+        $cols = implode(',', array_keys($data));
+        $place = ':' . implode(',:', array_keys($data));
+        $pdo->prepare("INSERT INTO fundraiser_contributions ($cols) VALUES ($place)")->execute($data);
+    }
 
     // Also create a record in main donations table for unified tracking
     try {
-        $pdo->prepare("INSERT INTO donations (donor_name, email, phone, amount, currency, donation_type, purpose, payment_method, payment_status, message, is_anonymous, receipt_required)
-                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?)")
+        $pdo->prepare("INSERT INTO donations (donor_name, email, phone, amount, currency, donation_type, purpose, payment_method, payment_status, message, is_anonymous, receipt_required, transaction_id)
+                       VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)")
             ->execute([
                 $is_anon ? 'Anonymous Donor' : $donor_name,
                 $email ?: 'anonymous@noemail.local',
@@ -60,7 +79,8 @@ try {
                 'bank_transfer',
                 'pending',
                 $data['message'],
-                $is_anon, 0
+                $is_anon, 0,
+                $transaction_id
             ]);
     } catch (Throwable $e) {}
 
@@ -88,15 +108,15 @@ try {
     // Acknowledge donor
     if ($email) {
         $dbody  = '<p>Dear ' . htmlspecialchars($donor_name) . ',</p>';
-        $dbody .= '<p>Thank you for pledging your support to <strong>"' . htmlspecialchars($f['title']) . '"</strong>! 🙏</p>';
+        $dbody .= '<p>Thank you for supporting <strong>"' . htmlspecialchars($f['title']) . '"</strong>! 🙏</p>';
         $dbody .= '<p style="font-size:22px;color:#2563eb;text-align:center;margin:15px 0;font-weight:800">' . $sym . number_format($amount, 0) . '</p>';
-        $dbody .= '<p>Please complete your payment using the bank/UPI details on the fundraiser page or visit our donation page.</p>';
-        $dbody .= '<p>Once we receive your payment, we will send you an official receipt.</p>';
+        $dbody .= '<p>We have received your Transaction / Reference ID: <code>' . htmlspecialchars($transaction_id) . '</code></p>';
+        $dbody .= '<p>Our team will verify the payment against this ID. Once confirmed, we will send you an official receipt.</p>';
         try { send_mail($email, 'Thank you for your contribution',
                        email_template('🙏 Thank You for Contributing!', $dbody, 'Visit Donation Page', BASE_URL.'pages/donate.php')); } catch (Throwable $e){}
     }
 
-    flash_set('success', '🙏 Thank you for your pledge! Please complete the payment to confirm. The organizer will be notified.');
+    flash_set('success', '🙏 Thank you for your contribution! We have your Transaction ID and will verify the payment shortly. The organizer will be notified.');
 } catch (Exception $ex) {
     flash_set('error', 'Submission failed: ' . $ex->getMessage());
 }

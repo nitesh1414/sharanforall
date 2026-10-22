@@ -102,7 +102,7 @@ $rows = $pdo->query("SELECT * FROM mission_phases ORDER BY display_order, phase_
 ?>
   <tr>
     <td><strong style="color:var(--primary);font-size:1.05rem">Phase <?= (int)$r['phase_number'] ?></strong></td>
-    <td style="font-size:1.4rem"><?= e($r['icon']) ?></td>
+    <td style="font-size:1.4rem"><?= e(icon_or($r['icon'], '🎯')) ?></td>
     <td><strong><?= e($r['title']) ?></strong></td>
     <td><?php if($r['capacity']): ?><span class="status-badge" style="background:#eaf2ff;color:#1d4ed8"><?= e($r['capacity']) ?></span><?php endif; ?></td>
     <td style="font-size:.85rem;color:#666;max-width:350px"><?= e(mb_strimwidth($r['description'], 0, 100, '...')) ?></td>
