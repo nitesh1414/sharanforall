@@ -451,8 +451,7 @@ require __DIR__ . '/includes/public_header.php';
       <p><?= e(t('locations_sub')) ?></p>
     </div>
     <div class="loc-grid">
-      <div class="loc-card"><div class="flag">🇮🇳</div><h3><?= e(t('india_ops')) ?></h3><p><?= e(get_setting('address_in')) ?></p><ul><li>Child & girl education programs</li><li>Women empowerment & skills training</li><li>Old-age homes & care facilities</li><li>Boys' & girls' hostels</li><li>Acts Bible College</li></ul></div>
-      <div class="loc-card"><div class="flag">🇬🇧</div><h3><?= e(t('uk_ops')) ?></h3><p><?= e(get_setting('address_uk')) ?></p><ul><li>Fundraising & sponsorships</li><li>Volunteer & partnership programs</li><li>Local community outreach</li><li>Mission awareness & advocacy</li><li>Prayer & support network</li></ul></div>
+      <div class="loc-card"><div class="flag">🇮🇳</div><h3><?= e(t('india_ops')) ?></h3><p><?= e(get_setting('address_in')) ?></p><ul><li>Child & girl education programs</li><li>Women empowerment & skills training</li><li>Old-age homes & care facilities</li><li>Boys' & girls' hostels</li></ul></div>
     </div>
   </div>
 </section>
