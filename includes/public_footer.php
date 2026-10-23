@@ -13,8 +13,8 @@
         </div>
         <p><?= e(get_setting('about_short')) ?></p>
         <div class="socials">
-          <a href="<?= e(get_setting('facebook','#')) ?>" title="Facebook">f</a>
-          <a href="<?= e(get_setting('instagram','#')) ?>" title="Instagram">◉</a>
+          <a href="<?= e(get_setting('facebook','https://www.facebook.com/profile.php?id=61595340776747')) ?>" title="Facebook">f</a>
+          <a href="<?= e(get_setting('instagram','https://www.instagram.com/sharan.foundation07?srtk=MTdmeG9saWt3NDQ4MQ==')) ?>" title="Instagram">◉</a>
           <a href="<?= e(get_setting('youtube','#')) ?>" title="YouTube">▶</a>
           <a href="<?= e(get_setting('twitter','#')) ?>" title="Twitter">✕</a>
         </div>
@@ -32,7 +32,6 @@
         <li><a href="<?= $BU ?>pages/programs.php#women">Women Empowerment</a></li>
         <li><a href="<?= $BU ?>pages/programs.php#oldage">Old Age Home</a></li>
         <li><a href="<?= $BU ?>pages/programs.php#girls-hostel">Hostels</a></li>
-        <li><a href="<?= $BU ?>pages/programs.php#bible-college">Bible College</a></li>
       </ul></div>
       <div class="foot"><h4><?= e(t('get_involved')) ?></h4><ul>
         <li><a href="<?= $BU ?>pages/volunteer.php"><?= e(t('nav_volunteer')) ?></a></li>
