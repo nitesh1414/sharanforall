@@ -18,7 +18,7 @@ define('DB_CHARSET', 'utf8mb4');
 
 
 // Base URL — change if your folder name differs.
-define('BASE_URL', 'http://localhost/LIVEpro/sharan/');
+define('BASE_URL', '');
 define('ADMIN_URL', BASE_URL . 'admin/');
 define('UPLOAD_URL', BASE_URL . 'uploads/');
 define('UPLOAD_PATH', __DIR__ . '/../uploads/');
