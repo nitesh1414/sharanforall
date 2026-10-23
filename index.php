@@ -419,7 +419,6 @@ require __DIR__ . '/includes/public_header.php';
     <div class="section-head">
       <span class="tag"><?= e(t('programs_badge')) ?></span>
       <h2><?= e(t('programs_title')) ?></h2>
-      <p><?= count($programs) ?></p>
     </div>
     <div class="programs-grid">
       <?php
