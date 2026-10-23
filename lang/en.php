@@ -60,7 +60,7 @@ return [
     'programs_title'  => 'Our Core Programs',
     'locations_badge' => '✦ WHERE WE SERVE',
     'locations_title' => 'Our Global Presence',
-    'locations_sub'   => 'From the villages of India to the cities of the UK — extending love without borders.',
+    'locations_sub'   => 'From the villages of India to the cities of the Globe — extending love without borders.',
     'india_ops'       => 'India Operations',
     'uk_ops'          => 'United Kingdom Operations',
     'donate_band_title' => 'Your Generosity Changes Lives',
